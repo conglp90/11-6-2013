@@ -8,6 +8,21 @@ public class Calculator {
 		int kq=0;
 		if(input==null||input.isEmpty())
 			return 0;
+		
+		if(input.contains("//")){
+			String input1=input.substring(0,input.indexOf("\n"));
+			Matcher matcher=Pattern.compile("\\[([^\\[]+)\\]").matcher(input1);
+			ArrayList<String> delimiters=new ArrayList<String>();
+			while (matcher.find()) {
+				delimiters.add(matcher.group(1));
+				System.out.println(matcher.group(1));
+			}
+			input=input.substring(input.indexOf("\n"));
+			for (String string : delimiters) {
+				input=input.replaceAll(Pattern.quote(string),",");
+			}
+		}
+		
 		ArrayList< Integer> numbers = toArrayListNumbers(input);
 		checkNegatives(numbers);
 		return sum(numbers);
