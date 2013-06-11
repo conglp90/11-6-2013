@@ -29,6 +29,8 @@ public class Calculator {
 	private static int sum(ArrayList<Integer> numbers) {
 		int kq=0;
 		for (Integer temp : numbers) {
+			if(temp>1000)
+				temp=0;
 			kq+=temp;
 		}
 		return kq;
