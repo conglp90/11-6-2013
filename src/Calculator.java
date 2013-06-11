@@ -8,7 +8,13 @@ public class Calculator {
 		int kq=0;
 		if(input==null||input.isEmpty())
 			return 0;
-		
+		input= processDelimitter(input);
+		ArrayList< Integer> numbers = toArrayListNumbers(input);
+		checkNegatives(numbers);
+		return sum(numbers);
+	}
+	
+	private static String processDelimitter(String input) {
 		if(input.contains("//")){
 			String input1=input.substring(0,input.indexOf("\n"));
 			Matcher matcher=Pattern.compile("\\[([^\\[]+)\\]").matcher(input1);
@@ -22,12 +28,9 @@ public class Calculator {
 				input=input.replaceAll(Pattern.quote(string),",");
 			}
 		}
-		
-		ArrayList< Integer> numbers = toArrayListNumbers(input);
-		checkNegatives(numbers);
-		return sum(numbers);
+		return input;
 	}
-	
+
 	private static void checkNegatives(ArrayList<Integer> numbers) {
 		String negatives="negatives not allowed:";
 		boolean isNegatives=false;
