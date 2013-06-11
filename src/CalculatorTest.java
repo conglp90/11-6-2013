@@ -54,4 +54,9 @@ public class CalculatorTest {
 		}
 		assertTrue(e.getMessage().equals("negatives not allowed: -100, -2000, -3, -7"));
 	}
+	
+	@Test
+	public void testWithNumberLagerThan1000() {
+		assertTrue(Calculator.add("1,2,3,1004") == 6);
+	}
 }
