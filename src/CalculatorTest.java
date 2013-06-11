@@ -59,4 +59,9 @@ public class CalculatorTest {
 	public void testWithNumberLagerThan1000() {
 		assertTrue(Calculator.add("1,2,3,1004") == 6);
 	}
+	
+	@Test
+	public void testWithMultiCharDelimiter() {
+		assertTrue(Calculator.add("//[a$^5&%a]\n1a$^5&%a2a$^5&%a3a$^5&%a4") == 10);
+	}
 }
