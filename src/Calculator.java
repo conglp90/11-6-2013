@@ -9,7 +9,11 @@ public class Calculator {
 		if(input==null||input.isEmpty())
 			return 0;
 		ArrayList< Integer> numbers = toArrayListNumbers(input);
-		
+		checkNegatives(numbers);
+		return sum(numbers);
+	}
+	
+	private static void checkNegatives(ArrayList<Integer> numbers) {
 		String negatives="negatives not allowed:";
 		boolean isNegatives=false;
 		for (int integer : numbers) {
@@ -20,8 +24,6 @@ public class Calculator {
 		}
 		if(isNegatives)
 			throw new RuntimeException(negatives);
-		
-		return sum(numbers);
 	}
 	
 	private static int sum(ArrayList<Integer> numbers) {
