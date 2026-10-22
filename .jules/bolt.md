@@ -1,0 +1,3 @@
+## 2025-05-18 - Pre-compiled Regex Patterns in Java
+**Learning:** Compiling `Pattern` inline inside methods called repeatedly (or inside loops) creates significant overhead because `Pattern.compile()` parses and compiles regular expressions on every invocation. In Java, `Pattern` instances are thread-safe and immutable once created, making `private static final Pattern` constants the ideal optimization.
+**Action:** Always check Java utilities or string parsing methods for inline `Pattern.compile()` or `String.replaceAll()` / `String.split()` calls with fixed patterns, and convert them to reusable static `Pattern` constants.
