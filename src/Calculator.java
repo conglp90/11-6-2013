@@ -4,67 +4,74 @@ import java.util.regex.Pattern;
 
 public class Calculator {
 
+	// Pre-compiled regex pattern for searching custom delimiter declarations like [delimiter]
+	private static final Pattern BRACKET_DELIMITER_PATTERN = Pattern.compile("\\[([^\\[]+)\\]");
+
+	// Pre-compiled regex pattern for extracting integers (including negative numbers)
+	private static final Pattern NUMBER_PATTERN = Pattern.compile("-?[0-9]+");
+
+	/**
+	 * Adds numbers contained within the input string.
+	 * Optimized to reduce object allocation and avoid costly string re-parsing operations.
+	 */
 	public static int add(String input) {
-		int kq=0;
-		if(input==null||input.isEmpty())
+		if (input == null || input.isEmpty()) {
 			return 0;
-		input= processDelimitter(input);
-		ArrayList< Integer> numbers = toArrayListNumbers(input);
-		checkNegatives(numbers);
-		return sum(numbers);
-	}
-	
-	private static String processDelimitter(String input) {
-		if(input.contains("//")){
-			String input1=input.substring(0,input.indexOf("\n"));
-			Matcher matcher=Pattern.compile("\\[([^\\[]+)\\]").matcher(input1);
-			ArrayList<String> delimiters=new ArrayList<String>();
-			while (matcher.find()) {
-				delimiters.add(matcher.group(1));
-				System.out.println(matcher.group(1));
-			}
-			input=input.substring(input.indexOf("\n"));
-			for (String string : delimiters) {
-				input=input.replaceAll(Pattern.quote(string),",");
+		}
+
+		if (input.startsWith("//")) {
+			input = processDelimiter(input);
+		}
+
+		Matcher matcher = NUMBER_PATTERN.matcher(input);
+		int sum = 0;
+		StringBuilder negatives = null;
+
+		// Extract numbers and accumulate sum and negative numbers in a single pass
+		while (matcher.find()) {
+			int temp = Integer.parseInt(matcher.group());
+			if (temp < 0) {
+				if (negatives == null) {
+					negatives = new StringBuilder("negatives not allowed: ").append(temp);
+				} else {
+					negatives.append(", ").append(temp);
+				}
+			} else if (temp <= 1000) {
+				sum += temp;
 			}
 		}
-		return input;
+
+		if (negatives != null) {
+			throw new RuntimeException(negatives.toString());
+		}
+
+		return sum;
 	}
 
-	private static void checkNegatives(ArrayList<Integer> numbers) {
-		String negatives="negatives not allowed:";
-		boolean isNegatives=false;
-		for (int integer : numbers) {
-			if (integer<0) {
-				negatives+= isNegatives ? ", "+integer : " "+integer;
-				isNegatives=true;
-			}
+	private static String processDelimiter(String input) {
+		int newLineIdx = input.indexOf('\n');
+		if (newLineIdx == -1) {
+			return input;
 		}
-		if(isNegatives)
-			throw new RuntimeException(negatives);
-	}
-	
-	private static int sum(ArrayList<Integer> numbers) {
-		int kq=0;
-		for (Integer temp : numbers) {
-			if(temp>1000)
-				temp=0;
-			kq+=temp;
-		}
-		return kq;
-	}
-	
-	private static ArrayList<Integer> toArrayListNumbers(String input) {
-		ArrayList< Integer> numbers =new ArrayList<Integer>();
-		Matcher matcher=Pattern.compile("-?[0-9]+").matcher(input);
+
+		String header = input.substring(0, newLineIdx);
+		String body = input.substring(newLineIdx);
+
+		Matcher matcher = BRACKET_DELIMITER_PATTERN.matcher(header);
+		boolean foundDelimiter = false;
+
 		while (matcher.find()) {
-			int temp=toInt(matcher.group(0));
-			numbers.add(temp);
+			String delimiter = matcher.group(1);
+			body = body.replaceAll(Pattern.quote(delimiter), ",");
+			foundDelimiter = true;
 		}
-		return numbers;
-	}
-	
-	private static int toInt(String input){
-		return Integer.parseInt(input);
+
+		// If no bracketed delimiter was found, check if there's a single char delimiter specified after //
+		if (!foundDelimiter && header.length() > 2) {
+			String delimiter = header.substring(2);
+			body = body.replaceAll(Pattern.quote(delimiter), ",");
+		}
+
+		return body;
 	}
 }
