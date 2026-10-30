@@ -4,6 +4,10 @@ import java.util.regex.Pattern;
 
 public class Calculator {
 
+	// Pre-compile regex patterns as static final constants to prevent recompilation on every invocation
+	private static final Pattern BRACKET_PATTERN = Pattern.compile("\\[([^\\[]+)\\]");
+	private static final Pattern NUMBER_PATTERN = Pattern.compile("-?[0-9]+");
+
 	public static int add(String input) {
 		int kq=0;
 		if(input==null||input.isEmpty())
@@ -17,11 +21,10 @@ public class Calculator {
 	private static String processDelimitter(String input) {
 		if(input.contains("//")){
 			String input1=input.substring(0,input.indexOf("\n"));
-			Matcher matcher=Pattern.compile("\\[([^\\[]+)\\]").matcher(input1);
+			Matcher matcher=BRACKET_PATTERN.matcher(input1);
 			ArrayList<String> delimiters=new ArrayList<String>();
 			while (matcher.find()) {
 				delimiters.add(matcher.group(1));
-				System.out.println(matcher.group(1));
 			}
 			input=input.substring(input.indexOf("\n"));
 			for (String string : delimiters) {
@@ -56,7 +59,7 @@ public class Calculator {
 	
 	private static ArrayList<Integer> toArrayListNumbers(String input) {
 		ArrayList< Integer> numbers =new ArrayList<Integer>();
-		Matcher matcher=Pattern.compile("-?[0-9]+").matcher(input);
+		Matcher matcher=NUMBER_PATTERN.matcher(input);
 		while (matcher.find()) {
 			int temp=toInt(matcher.group(0));
 			numbers.add(temp);
