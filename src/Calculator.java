@@ -4,67 +4,71 @@ import java.util.regex.Pattern;
 
 public class Calculator {
 
+	// Pre-compiled regex patterns to avoid recompiling on every invocation
+	private static final Pattern DELIMITER_PATTERN = Pattern.compile("\\[([^\\[]+)\\]");
+	private static final Pattern NUMBER_PATTERN = Pattern.compile("-?[0-9]+");
+
 	public static int add(String input) {
-		int kq=0;
-		if(input==null||input.isEmpty())
+		if (input == null || input.isEmpty())
 			return 0;
-		input= processDelimitter(input);
-		ArrayList< Integer> numbers = toArrayListNumbers(input);
+		input = processDelimitter(input);
+		ArrayList<Integer> numbers = toArrayListNumbers(input);
 		checkNegatives(numbers);
 		return sum(numbers);
 	}
 	
 	private static String processDelimitter(String input) {
-		if(input.contains("//")){
-			String input1=input.substring(0,input.indexOf("\n"));
-			Matcher matcher=Pattern.compile("\\[([^\\[]+)\\]").matcher(input1);
-			ArrayList<String> delimiters=new ArrayList<String>();
+		if (input.contains("//")) {
+			String input1 = input.substring(0, input.indexOf("\n"));
+			Matcher matcher = DELIMITER_PATTERN.matcher(input1);
+			ArrayList<String> delimiters = new ArrayList<String>();
 			while (matcher.find()) {
 				delimiters.add(matcher.group(1));
-				System.out.println(matcher.group(1));
 			}
-			input=input.substring(input.indexOf("\n"));
+			input = input.substring(input.indexOf("\n"));
 			for (String string : delimiters) {
-				input=input.replaceAll(Pattern.quote(string),",");
+				input = input.replaceAll(Pattern.quote(string), ",");
 			}
 		}
 		return input;
 	}
 
 	private static void checkNegatives(ArrayList<Integer> numbers) {
-		String negatives="negatives not allowed:";
-		boolean isNegatives=false;
+		StringBuilder negatives = null;
 		for (int integer : numbers) {
-			if (integer<0) {
-				negatives+= isNegatives ? ", "+integer : " "+integer;
-				isNegatives=true;
+			if (integer < 0) {
+				if (negatives == null) {
+					negatives = new StringBuilder("negatives not allowed: ").append(integer);
+				} else {
+					negatives.append(", ").append(integer);
+				}
 			}
 		}
-		if(isNegatives)
-			throw new RuntimeException(negatives);
+		if (negatives != null)
+			throw new RuntimeException(negatives.toString());
 	}
 	
 	private static int sum(ArrayList<Integer> numbers) {
-		int kq=0;
+		int kq = 0;
 		for (Integer temp : numbers) {
-			if(temp>1000)
-				temp=0;
-			kq+=temp;
+			if (temp > 1000)
+				temp = 0;
+			kq += temp;
 		}
 		return kq;
 	}
 	
 	private static ArrayList<Integer> toArrayListNumbers(String input) {
-		ArrayList< Integer> numbers =new ArrayList<Integer>();
-		Matcher matcher=Pattern.compile("-?[0-9]+").matcher(input);
+		ArrayList<Integer> numbers = new ArrayList<Integer>();
+		Matcher matcher = NUMBER_PATTERN.matcher(input);
 		while (matcher.find()) {
-			int temp=toInt(matcher.group(0));
+			int temp = toInt(matcher.group(0));
 			numbers.add(temp);
 		}
 		return numbers;
 	}
 	
-	private static int toInt(String input){
+	private static int toInt(String input) {
 		return Integer.parseInt(input);
 	}
 }
